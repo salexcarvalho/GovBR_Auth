@@ -1,0 +1,25 @@
+
+{
+    "name": "salexcarvalho/govbr-auth",
+    "description": "Pacote Laravel para autenticação Gov.br (OIDC)",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+      "psr-4": {
+        "Salexcarvalho\\GovBrAuth\\": "src/"
+      }
+    },
+    "extra": {
+      "laravel": {
+        "providers": [
+          "Salexcarvalho\\GovBrAuth\\Providers\\GovBrAuthServiceProvider"
+        ]
+      }
+    },
+    "require": {
+      "php": ">=7.4",
+      "illuminate/support": "^8.0|^9.0|^10.0",
+      "guzzlehttp/guzzle": "^7.0",
+      "firebase/php-jwt": "^6.0"
+    }
+  }

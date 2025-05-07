@@ -1,0 +1,5 @@
+# Garante que todo texto seja normalizado para LF no repositório
+* text=auto eol=lf
+
+# Se tiver arquivos que precisam mesmo de CRLF, especifique:
+# *.ps1 text eol=crlf
