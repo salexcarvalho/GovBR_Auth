@@ -1,5 +1,5 @@
 <?php
-namespace MyOrg\GovBrAuth\Services;
+namespace Salexcarvalho\GovBrAuth\Services;
 
 use GuzzleHttp\Client;
 use Firebase\JWT\JWT;

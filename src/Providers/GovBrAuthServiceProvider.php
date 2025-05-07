@@ -1,8 +1,8 @@
 <?php
-namespace MyOrg\GovBrAuth\Providers;
+namespace Salexcarvalho\GovBrAuth\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use MyOrg\GovBrAuth\Services\GovBrOidcService;
+use Salexcarvalho\GovBrAuth\Services\GovBrOidcService;
 
 class GovBrAuthServiceProvider extends ServiceProvider
 {
@@ -29,6 +29,6 @@ class GovBrAuthServiceProvider extends ServiceProvider
 
         // registra middleware
         $router = $this->app['router'];
-        $router->aliasMiddleware('govbr.auth', \MyOrg\GovBrAuth\Middleware\EnsureGovBrAuthenticated::class);
+        $router->aliasMiddleware('govbr.auth', \Salexcarvalho\GovBrAuth\Middleware\EnsureGovBrAuthenticated::class);
     }
 }

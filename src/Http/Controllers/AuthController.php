@@ -1,11 +1,11 @@
 <?php
-namespace MyOrg\GovBrAuth\Http\Controllers;
+namespace Salexcarvalho\GovBrAuth\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Controller;
-use MyOrg\GovBrAuth\Services\GovBrOidcService;
+use Salexcarvalho\GovBrAuth\Services\GovBrOidcService;
 use App\Models\User;
 
 class AuthController extends Controller

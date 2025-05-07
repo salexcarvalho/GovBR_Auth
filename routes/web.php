@@ -1,6 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use MyOrg\GovBrAuth\Http\Controllers\AuthController;
+use Salexcarvalho\GovBrAuth\Http\Controllers\AuthController;
 
 Route::prefix('auth/govbr')->group(function(){
     Route::get('redirect', [AuthController::class, 'redirectToProvider'])

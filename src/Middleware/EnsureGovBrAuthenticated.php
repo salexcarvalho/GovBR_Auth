@@ -1,5 +1,5 @@
 <?php
-namespace MyOrg\GovBrAuth\Middleware;
+namespace Salexcarvalho\GovBrAuth\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
