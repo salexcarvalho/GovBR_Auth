@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 beforeEach(function () {
-    Route::middleware(['web', 'govbr.auth'])->get('/rota-protegida', fn () => 'ok');
+    Route::middleware('govbr.auth')->get('/rota-protegida', fn () => 'ok');
 });
 
 it('permite acesso quando a sessão Gov.br está presente', function () {

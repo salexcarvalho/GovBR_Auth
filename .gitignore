@@ -1,6 +1,0 @@
-/vendor/
-/.phpunit.cache/
-/.pest/
-/coverage/
-.DS_Store
-Thumbs.db
