@@ -2,7 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use Salexcarvalho\GovBrAuth\Http\Controllers\AuthController;
 
-Route::prefix('auth/govbr')->group(function(){
+Route::middleware('web')->prefix('auth/govbr')->group(function(){
     Route::get('redirect', [AuthController::class, 'redirectToProvider'])
          ->name('govbr.login');
 
