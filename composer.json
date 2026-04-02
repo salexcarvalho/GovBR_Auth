@@ -1,25 +1,64 @@
-
 {
     "name": "salexcarvalho/govbr-auth",
-    "description": "Pacote Laravel para autenticação Gov.br (OIDC)",
+    "description": "Pacote Laravel para autenticação via Gov.br usando OpenID Connect (OIDC)",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "laravel",
+        "govbr",
+        "gov.br",
+        "sso",
+        "oidc",
+        "oauth2",
+        "autenticacao",
+        "brazil",
+        "governo-federal"
+    ],
+    "authors": [
+        {
+            "name": "Salex Carvalho",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/salexcarvalho/GovBR_Auth",
     "autoload": {
-      "psr-4": {
-        "Salexcarvalho\\GovBrAuth\\": "src/"
-      }
+        "psr-4": {
+            "Salexcarvalho\\GovBrAuth\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Salexcarvalho\\GovBrAuth\\Tests\\": "tests/"
+        }
     },
     "extra": {
-      "laravel": {
-        "providers": [
-          "Salexcarvalho\\GovBrAuth\\Providers\\GovBrAuthServiceProvider"
-        ]
-      }
+        "laravel": {
+            "providers": [
+                "Salexcarvalho\\GovBrAuth\\Providers\\GovBrAuthServiceProvider"
+            ]
+        }
     },
     "require": {
-      "php": ">=7.4",
-      "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
-      "guzzlehttp/guzzle": "^7.0",
-      "firebase/php-jwt": "^6.0"
-    }
-  }
+        "php": ">=7.4",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "firebase/php-jwt": "^6.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "pestphp/pest": "^2.0|^3.0",
+        "pestphp/pest-plugin-laravel": "^2.0|^3.0",
+        "mockery/mockery": "^1.6"
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test:coverage": "vendor/bin/pest --coverage"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

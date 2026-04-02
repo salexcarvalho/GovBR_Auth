@@ -1,94 +1,216 @@
-# GovBrAuth
+# GovBR Auth
 
-Pacote Laravel para autenticação via Gov.br usando OIDC (OpenID Connect).
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/salexcarvalho/govbr-auth.svg?style=flat-square)](https://packagist.org/packages/salexcarvalho/govbr-auth)
+[![PHP Version](https://img.shields.io/packagist/php-v/salexcarvalho/govbr-auth.svg?style=flat-square)](https://packagist.org/packages/salexcarvalho/govbr-auth)
+[![Laravel](https://img.shields.io/badge/Laravel-8.x--12.x-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
+[![Tests](https://img.shields.io/github/actions/workflow/status/salexcarvalho/GovBR_Auth/tests.yml?label=tests&style=flat-square)](https://github.com/salexcarvalho/GovBR_Auth/actions)
+[![License](https://img.shields.io/github/license/salexcarvalho/GovBR_Auth?style=flat-square)](LICENSE)
+
+Pacote Laravel para autenticação com o **[Gov.br](https://www.gov.br/pt-br/servicos/entrar-no-gov.br)** via protocolo **OpenID Connect (OIDC)**. Integre o login unificado do governo federal brasileiro em qualquer aplicação Laravel em minutos.
+
+---
+
+## Sumário
+
+- [Requisitos](#-requisitos)
+- [Instalação](#-instalação)
+- [Configuração](#-configuração)
+- [Rotas disponíveis](#-rotas-disponíveis)
+- [Protegendo rotas](#-protegendo-rotas)
+- [Modelo de usuário personalizado](#-modelo-de-usuário-personalizado)
+- [Tratamento de erros](#-tratamento-de-erros)
+- [Fluxo de autenticação](#-fluxo-de-autenticação)
+- [Testes](#-testes)
+- [Contribuição](#-contribuição)
+- [Changelog](#-changelog)
+- [Licença](#-licença)
+
+---
 
 ## 📦 Requisitos
 
-* PHP >= 7.4
-* Laravel ^8.0 | ^9.0 | ^10.0
-* Extensão OpenSSL ativada (para JWT)
-* [GuzzleHTTP](https://github.com/guzzle/guzzle)
-* [Firebase PHP-JWT](https://github.com/firebase/php-jwt)
+| Dependência | Versão mínima |
+|-------------|--------------|
+| PHP | 7.4 |
+| Laravel | 8.x, 9.x, 10.x, 11.x ou 12.x |
+| Extensão OpenSSL | qualquer |
+| GuzzleHTTP | ^7.0 |
+| firebase/php-jwt | ^6.0 |
+
+---
 
 ## 🚀 Instalação
 
-1. Adicione o repositório (caso esteja usando local via path) no `composer.json` da sua aplicação:
+```bash
+composer require salexcarvalho/govbr-auth
+```
 
-   ```jsonc
-   "repositories": [
-     {
-       "type": "path",
-       "url": "vendor/salexcarvalho/govbr-auth"
-     }
-   ],
-   "require": {
-     "salexcarvalho/govbr-auth": "*"
-   }
-   ```
+Publique o arquivo de configuração:
 
-2. Execute:
+```bash
+php artisan vendor:publish --tag=govbr-config
+```
 
-   ```bash
-   composer require salexcarvalho/govbr-auth
-   ```
-
-3. Publique as configurações:
-
-   ```bash
-   php artisan vendor:publish --tag=govbr-config
-   ```
+---
 
 ## 🔧 Configuração
 
-Após publicar, edite o arquivo `config/govbr.php` ou defina as variáveis no seu `.env`:
+Defina as variáveis no seu `.env`:
 
 ```dotenv
-GOVBR_CLIENT_ID=
-GOVBR_CLIENT_SECRET=
+GOVBR_CLIENT_ID=seu-client-id
+GOVBR_CLIENT_SECRET=seu-client-secret
 GOVBR_REDIRECT_URI=https://seu-dominio.com/auth/govbr/callback
+
+# Endpoints do SSO Gov.br (produção)
 GOVBR_AUTHZ_ENDPOINT=https://sso.acesso.gov.br/authorize
 GOVBR_TOKEN_ENDPOINT=https://sso.acesso.gov.br/token
 GOVBR_JWK_ENDPOINT=https://sso.acesso.gov.br/jwk
 ```
 
-## 🚧 Rotas
+> **Staging (homologação):** substitua `sso.acesso.gov.br` por `sso.staging.acesso.gov.br`.
 
-O pacote carrega automaticamente as rotas no prefixo `auth/govbr`. Você terá:
+Para obter credenciais, acesse o [Portal do Desenvolvedor Gov.br](https://www.gov.br/conecta/catalogo/).
 
-| Método | URI                    | Nome da Rota     | Descrição                           |
-| ------ | ---------------------- | ---------------- | ----------------------------------- |
-| GET    | `/auth/govbr/redirect` | `govbr.login`    | Redireciona para login Gov.br       |
-| GET    | `/auth/govbr/callback` | `govbr.callback` | Callback do Gov.br após autorização |
-| POST   | `/auth/govbr/logout`   | `govbr.logout`   | Logout da sessão Gov.br             |
+---
 
-## 🛡️ Protegendo Rotas
+## 🚧 Rotas disponíveis
 
-Para proteger rotas usando a sessão Gov.br, aplique o middleware:
+O pacote registra automaticamente as seguintes rotas:
+
+| Método | URI | Nome | Descrição |
+|--------|-----|------|-----------|
+| `GET` | `/auth/govbr/redirect` | `govbr.login` | Redireciona o usuário para o portal Gov.br |
+| `GET` | `/auth/govbr/callback` | `govbr.callback` | Recebe o código de autorização e autentica |
+| `POST` | `/auth/govbr/logout` | `govbr.logout` | Encerra a sessão Gov.br |
+
+Inicie o login com:
+
+```blade
+<a href="{{ route('govbr.login') }}">Entrar com Gov.br</a>
+```
+
+---
+
+## 🛡️ Protegendo rotas
+
+Use o middleware `govbr.auth` para restringir acesso a usuários autenticados via Gov.br:
 
 ```php
 Route::middleware('govbr.auth')->group(function () {
-    Route::get('/dashboard', function () {
-        // Acesso apenas para usuários autenticados via Gov.br
-    });
+    Route::get('/dashboard', DashboardController::class);
 });
 ```
 
-## 🔄 Fluxo de Autenticação
+---
 
-1. Usuário acessa `/auth/govbr/redirect`.
-2. É redirecionado ao portal Gov.br para login.
-3. Após login, Gov.br retorna para `/auth/govbr/callback` com um `code`.
-4. O pacote troca o `code` por `id_token` e `access_token`, valida o JWT via JWK e retorna as claims.
-5. Cria/atualiza o usuário local e realiza `Auth::login($user)`.
+## 👤 Modelo de usuário personalizado
+
+Por padrão, o pacote usa o modelo definido em `auth.providers.users.model`. Para sobrescrever, defina em `config/govbr.php` (ou via `.env`):
+
+```dotenv
+GOVBR_USER_MODEL=App\Models\Servidor
+```
+
+O modelo deve ter uma coluna `govbr_sub` (chave do usuário no Gov.br) e aceitar `name` e `email` como atributos preenchíveis:
+
+```php
+// migration
+$table->string('govbr_sub')->unique()->nullable();
+
+// Model
+protected $fillable = ['name', 'email', 'govbr_sub'];
+```
+
+---
+
+## ⚠️ Tratamento de erros
+
+O pacote lança `GovBrAuthException` em situações de erro. Registre um handler no seu `app/Exceptions/Handler.php` para apresentar uma resposta amigável ao usuário:
+
+```php
+use Salexcarvalho\GovBrAuth\Exceptions\GovBrAuthException;
+
+public function register(): void
+{
+    $this->renderable(function (GovBrAuthException $e) {
+        return redirect()->route('login')
+            ->withErrors(['govbr' => 'Não foi possível autenticar via Gov.br. Tente novamente.']);
+    });
+}
+```
+
+Situações que disparam a exceção:
+
+| Situação | Mensagem |
+|----------|---------|
+| Recusa de autorização pelo usuário | `Erro de autorização Gov.br: access_denied` |
+| Parâmetro `state` inválido (CSRF) | `Parâmetro state inválido.` |
+| Código de autorização ausente | `Código de autorização não recebido.` |
+| Falha de rede no endpoint de token | `Falha ao comunicar com o endpoint de token do Gov.br` |
+| `id_token` ausente na resposta | `Resposta do token inválida: id_token ausente.` |
+| JWT inválido ou expirado | `Falha na validação do id_token` |
+
+---
+
+## 🔄 Fluxo de autenticação
+
+```mermaid
+sequenceDiagram
+    participant U as Usuário
+    participant A as Aplicação Laravel
+    participant G as Gov.br SSO
+
+    U->>A: GET /auth/govbr/redirect
+    A->>A: Gera state aleatório e armazena na sessão
+    A-->>U: 302 → Gov.br (?state=...&client_id=...)
+    U->>G: Autentica com CPF/senha ou certificado
+    G-->>U: 302 → /auth/govbr/callback?code=...&state=...
+    U->>A: GET /auth/govbr/callback
+    A->>A: Valida state (proteção CSRF)
+    A->>G: POST /token (troca code por tokens)
+    G-->>A: id_token + access_token
+    A->>G: GET /jwk (chaves públicas — cache 24h)
+    G-->>A: JWKs
+    A->>A: Valida assinatura JWT (RS256)
+    A->>A: Cria ou atualiza User local
+    A-->>U: 302 → / (autenticado)
+```
+
+---
+
+## 🧪 Testes
+
+```bash
+composer test
+```
+
+Para gerar relatório de cobertura:
+
+```bash
+composer test:coverage
+```
+
+---
 
 ## 🤝 Contribuição
 
-1. Dê um fork no repositório.
-2. Crie uma branch com a feature: `git checkout -b feature/nova-funcionalidade`.
-3. Faça commit das suas alterações: `git commit -m 'Adiciona nova funcionalidade'`.
-4. Envie para a branch: `git push origin feature/nova-funcionalidade`.
-5. Abra um Pull Request.
+Contribuições são bem-vindas! Por favor, leia o [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir um Pull Request.
+
+1. Faça um fork do repositório
+2. Crie sua branch: `git checkout -b feature/minha-feature`
+3. Commit: `git commit -m 'feat: adiciona minha feature'`
+4. Push: `git push origin feature/minha-feature`
+5. Abra um Pull Request
+
+---
+
+## 📋 Changelog
+
+Veja o [CHANGELOG.md](CHANGELOG.md) para o histórico de mudanças.
+
+---
 
 ## 📝 Licença
 
-Este projeto está licenciado sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
+MIT — veja o arquivo [LICENSE](LICENSE) para mais detalhes.
